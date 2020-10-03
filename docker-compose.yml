@@ -1,18 +1,35 @@
 version: "3.7"
 
-services:        
+services:
   www:
-    container_name: "${DOCKER_APP_NAME}-wordpress"
-    build:
-      context: .
-      dockerfile: .docker/Dockerfile.wordpress
-    links:
+    depends_on:
+      - wordpress
+    image: nginx:1.15.12-alpine
+    container_name: "${DOCKER_APP_NAME}_www"
+    ports:
+      - "80:80"
+    volumes:
+      - wordpress:/var/www/html
+      - .docker/nginx:/etc/nginx/conf.d
+    networks:
+      - network
+
+  wordpress:
+    image: wordpress:5.1.1-fpm-alpine
+    container_name: "${DOCKER_APP_NAME}_wordpress"
+    depends_on:
       - db
     env_file: 
       - .docker/.env.wordpress
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - network
+    ports:
+      - 9000
 
   db:
-    container_name: "${DOCKER_APP_NAME}-db"
+    container_name: "${DOCKER_APP_NAME}_db"
     build:
       context: .
       dockerfile: .docker/Dockerfile.db
@@ -20,7 +37,16 @@ services:
         - .docker/.env.db
     volumes:
       - database:/var/lib/mysql
+    networks:
+      - network
+    ports:
+      - 3306
 
 volumes:
   database:
-  # node_modules:
+  wordpress:
+  
+networks:
+  network:
+    name: "${DOCKER_APP_NAME}_network"
+    driver: bridge 

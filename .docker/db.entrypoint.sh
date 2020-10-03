@@ -41,6 +41,12 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' IDENTIFIED BY '$MYSQL_ROOT_PWD
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PWD' WITH GRANT OPTION;
 EOF
 
+	# don`t need to create new database,Set new User to control all database.
+	if [ "$MYSQL_USER" != "" ] && [ "$MYSQL_USER_PWD" != "" ]; then
+		echo "[i] Creating user: $MYSQL_USER with password $MYSQL_USER_PWD"
+		echo "GRANT ALL ON *.* to '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_USER_PWD';" >> $tfile
+	fi
+
 	echo 'FLUSH PRIVILEGES;' >> $tfile
 
 	# run sql in tempfile
