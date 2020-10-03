@@ -1,0 +1,9 @@
+FROM alpine:3.7
+
+LABEL author=hsimah
+LABEL author_uri=https://github.com/hsimah-services
+
+COPY .docker/wordpress.entrypoint.sh /usr/bin/wordpress.entrypoint.sh
+RUN chmod +x /usr/bin/wordpress.entrypoint.sh
+
+ENTRYPOINT ["wordpress.entrypoint.sh"]

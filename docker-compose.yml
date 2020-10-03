@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:        
+  www:
+    container_name: "${DOCKER_APP_NAME}-wordpress"
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.wordpress
+    links:
+      - db
+    env_file: 
+      - .docker/.env.wordpress
+
+  db:
+    container_name: "${DOCKER_APP_NAME}-db"
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.db
+    env_file: 
+        - .docker/.env.db
+    volumes:
+      - database:/var/lib/mysql
+
+volumes:
+  database:
+  # node_modules:

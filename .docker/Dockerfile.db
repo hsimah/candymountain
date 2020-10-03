@@ -1,0 +1,16 @@
+FROM alpine:3.7
+
+LABEL author=hsimah
+LABEL author_uri=https://github.com/hsimah-services
+
+RUN apk update && \
+	apk add mysql mysql-client && \
+	addgroup mysql mysql && \
+	rm -rf /var/cache/apk/*
+
+COPY .docker/db.entrypoint.sh /usr/bin/db.entrypoint.sh
+RUN chmod +x /usr/bin/db.entrypoint.sh
+
+EXPOSE 3306
+
+ENTRYPOINT ["db.entrypoint.sh"]
