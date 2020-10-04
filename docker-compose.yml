@@ -15,7 +15,9 @@ services:
       - network
 
   wordpress:
-    image: wordpress:5.1.1-fpm-alpine
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.wordpress
     container_name: "${DOCKER_APP_NAME}_wordpress"
     depends_on:
       - db
@@ -23,10 +25,14 @@ services:
       - .docker/.env.wordpress
     volumes:
       - wordpress:/var/www/html
+      - ./plugins:/var/www/html/wp-content/plugins
     networks:
       - network
     ports:
+      - 6969
       - 9000
+    extra_hosts: 
+      - "wsl:172.26.126.157"
 
   db:
     container_name: "${DOCKER_APP_NAME}_db"
