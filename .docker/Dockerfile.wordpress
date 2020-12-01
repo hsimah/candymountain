@@ -3,16 +3,26 @@ FROM wordpress:5.1.1-fpm-alpine
 LABEL author=hsimah
 LABEL author_uri=https://github.com/hsimah-services
 
-RUN apk add --no-cache $PHPIZE_DEPS
+# dev dependencies
+RUN apk add --no-cache openssh-client nodejs npm git mysql-client $PHPIZE_DEPS
+# xdebug
 RUN pecl channel-update pecl.php.net && \
   pecl install xdebug
+# xdebug config
 RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)" > /usr/local/etc/php/conf.d/xdebug.ini && \
   echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
   echo "xdebug.remote_autostart=1" >> /usr/local/etc/php/conf.d/xdebug.ini && \
   echo "xdebug.remote_port=6969" >> /usr/local/etc/php/conf.d/xdebug.ini && \
   echo "xdebug.remote_handler=dbgp" >> /usr/local/etc/php/conf.d/xdebug.ini && \
-  echo "xdebug.remote_host=wsl" >> /usr/local/etc/php/conf.d/xdebug.ini && \
+  echo "xdebug.remote_host=wordpress" >> /usr/local/etc/php/conf.d/xdebug.ini && \
   echo "xdebug.idekey=VSCODE" >> /usr/local/etc/php/conf.d/xdebug.ini
+
+# wp-cli
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp
+
+RUN mkdir /root/.ssh && chmod 700 -R /root/.ssh
 
 EXPOSE 3306
 

@@ -4,9 +4,17 @@
 		"docker-compose.yml"
 	],
 	"service": "wordpress",
-  "runServices": ["www"],
+	"runServices": [
+		"www"
+	],
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
+		"eslint.alwaysShowStatus": true,
+		"eslint.format.enable": true,
+		"eslint.lintTask.enable": true,
+		"eslint.workingDirectories": [
+			// add plugin dir here
+		]
 	},
 	"extensions": [
 		"dbaeumer.vscode-eslint",
@@ -17,5 +25,10 @@
 	"forwardPorts": [
 		80,
 		3000,
+		9000
 	],
+	"initializeCommand": [
+		".docker/scripts/build-container.sh",
+	],
+	"postStartCommand": [],
 }

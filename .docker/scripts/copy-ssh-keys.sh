@@ -1,0 +1,1 @@
+docker cp ~/.ssh/id_rsa candymountain_wordpress:/root/.ssh/id_rsa

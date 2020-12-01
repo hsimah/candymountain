@@ -10,29 +10,41 @@ services:
       - "80:80"
     volumes:
       - wordpress:/var/www/html
+      - .docker/wp-content:/var/www/html/wp-content:delegated
+      - ".:/var/www/html/wp-content/plugins/${DOCKER_APP_NAME}:delegated"
       - .docker/nginx:/etc/nginx/conf.d
     networks:
       - network
 
   wordpress:
+    container_name: "${DOCKER_APP_NAME}_wordpress"
     build:
       context: .
       dockerfile: .docker/Dockerfile.wordpress
-    container_name: "${DOCKER_APP_NAME}_wordpress"
-    depends_on:
+    links:
       - db
     env_file: 
-      - .docker/.env.wordpress
+      - .docker/wordpress.env
     volumes:
+      - .docker/.bashrc:/root/.bashrc:cached
+      - .docker/share:/root/share:delegated
       - wordpress:/var/www/html
-      - ./plugins:/var/www/html/wp-content/plugins
+      - .docker/wp-content:/var/www/html/wp-content:delegated
+      - ".:/var/www/html/wp-content/plugins/${DOCKER_APP_NAME}:delegated"
+      - type: tmpfs
+        target: "/var/www/html/wp-content/plugins/${DOCKER_APP_NAME}/.docker/share"
+        volume:
+          nocopy: true
+        tmpfs:
+          size: 0
+      - type: tmpfs
+        target: "/var/www/html/wp-content/plugins/${DOCKER_APP_NAME}/.docker/wp-content"
+        volume:
+          nocopy: true
+        tmpfs:
+          size: 0
     networks:
       - network
-    ports:
-      - 6969
-      - 9000
-    extra_hosts: 
-      - "wsl:172.26.126.157"
 
   db:
     container_name: "${DOCKER_APP_NAME}_db"
@@ -40,17 +52,18 @@ services:
       context: .
       dockerfile: .docker/Dockerfile.db
     env_file: 
-        - .docker/.env.db
+        - .docker/db.env
     volumes:
-      - database:/var/lib/mysql
+      - db:/var/lib/mysql
     networks:
       - network
     ports:
       - 3306
 
 volumes:
-  database:
+  db:
   wordpress:
+  node_modules:
   
 networks:
   network:
